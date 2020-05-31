@@ -11,7 +11,8 @@ def getContent(fp):
     #fixed to now read the file and go through the content of it, now will display to ensure that it is correct. 
     num_pages = pdf2.PdfFileReader(open(holder, "rb")).getNumPages()
     for i in range(0, num_pages):
-        content += line.getPage(i).extractText() + "\n\n"
+        content += line.getPage(i).extractText() + "\n"
+        x.write(content)
     content = " ".join(content.replace(u"\xa0", " ").strip().split())
     #content is printing out and being stored, need to have it set to be a nicer format.
     print(content)
@@ -46,10 +47,31 @@ def log_error(e):
 #saving the contents of the web page in a document
 def getWebContent(x):
     for i, li in enumerate(html.select('li')):
+        m.write(li.text)
+        m.write("\n")
         print(i, li.text)
 
     return None
 
+#need to do the comparison now between the two files of the 
+#job listing and the persons resume. 
+#will be using a dictionary to look up the differences between them as
+#checking which words match would help the search. 
+def Matching(file1, file2):
+    file1Position = {}
+    file2Position = {}
+
+    with open(file1, 'r') as textfile:
+        words = (word for line in textfile.read() for word in line.split())
+        file1Position = {i: word for i, word in enumerate(words)}
+        print(file1Position)
+
+    with open(file2, 'r') as textfile:
+        words2 = (word for line in textfile.read() for word in line.split())
+        file2Position = {i: word for i, word in enumerate(words2)}
+        print(words2)
+
+    return None
 if __name__ == '__main__':
     holder = input("please enter the resume file\n")
 
@@ -60,9 +82,12 @@ if __name__ == '__main__':
         print('file is not empty')
 
     f = open(holder)
+    x = open("ResumeOutputFile.txt", "w+")
+
+    #creating the write file for the job listing details. 
+    m = open("jobListingDetails.txt", "w+")
 
     getContent(holder)
-    #code goes here then close at the end
     
     #raw = input("please enter a valid URL/ Ex. https://www.google.com \n")
     
@@ -72,4 +97,10 @@ if __name__ == '__main__':
     html = BeautifulSoup(raw_html, 'html.parser')
 
     getWebContent(html)
+
+    #x will be the resume file, m will be the job listing
+    Matching(x, m)
+
+    m.close()
+    x.close()
     f.close()
