@@ -1,9 +1,13 @@
 import PyPDF2 as pdf2
+import numpy as np
+import csv
+import os
+import json
 from requests import get
 from requests.exceptions import RequestException
 from contextlib import closing
 from bs4 import BeautifulSoup
-import os
+
 
 def getContent(fp):
     line = pdf2.PdfFileReader(holder)
@@ -53,25 +57,47 @@ def getWebContent(x):
 
     return None
 
+#using seperate function to write from joblistingdetails.txt
+#to write to Dictionary.txt
+#have it writing properly to the file, now going to see if it will
+#work properly with storing in an array. 
+def writeToDictionaryFile():
+    jobFile = open('jobListingDetails.txt')
+    dictFile = open('Dictionary.txt')
+
+    with jobFile as h:
+        with dictFile as f1:
+            for line in h:
+                f1.write(line)
+
+    jobFile.close()
+    dictFile.close()
+
+    return None
+
+
 #need to do the comparison now between the two files of the 
 #job listing and the persons resume. 
 #will be using a dictionary to look up the differences between them as
 #checking which words match would help the search. 
-def Matching(file1, file2):
-    file1Position = {}
-    file2Position = {}
-
-    with open(file1, 'r') as textfile:
-        words = (word for line in textfile.read() for word in line.split())
-        file1Position = {i: word for i, word in enumerate(words)}
-        print(file1Position)
-
-    with open(file2, 'r') as textfile:
-        words2 = (word for line in textfile.read() for word in line.split())
-        file2Position = {i: word for i, word in enumerate(words2)}
-        print(words2)
+def Matching():
+    #a will be for the comparison. 
+    #not sure why I have to copy over the array to a new file to be read
+    #does not make sense. but will continue with it. 
+    a = []
+    b = []
+    #no need to pass in anymore and can just open here. 
+    filename = 'Dictionary.txt'
+    with open(filename) as fh:
+        print("made it here")
+        for line in fh:   
+            #appending properly for the array. 
+            print("why arent you populating")
+            a.append(line)
+            print(a)
 
     return None
+
 if __name__ == '__main__':
     holder = input("please enter the resume file\n")
 
@@ -86,11 +112,9 @@ if __name__ == '__main__':
 
     #creating the write file for the job listing details. 
     m = open("jobListingDetails.txt", "w+")
-
+    o = open("Dictionary.txt")
     getContent(holder)
-    
-    #raw = input("please enter a valid URL/ Ex. https://www.google.com \n")
-    
+        
     #need to figure out why it is not working with input and only putting it in 
     raw_html = getSimpleUrl("https://www.indeed.com/jobs?q=software%20developer&l=Montclair%2C%20CA%2C%2091763&ts=1583876659225&rq=1&rsIdx=0&fromage=last&newcount=128&advn=523043765138470&vjk=337c8f7706e724f3")
 
@@ -98,9 +122,13 @@ if __name__ == '__main__':
 
     getWebContent(html)
 
+    #calling writeToDictionary to write to the text file so it can be read properly
+    writeToDictionaryFile()
+
     #x will be the resume file, m will be the job listing
-    Matching(x, m)
+    Matching()
 
     m.close()
     x.close()
+    o.close()
     f.close()
